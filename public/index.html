@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latest Record</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: auto; padding: 20px; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Latest Record</h1>
+        <p id="current-time">Current Time: Loading...</p>
+        <pre id="record-data">Loading...</pre>
+        <p id="created-at">Created At: Loading...</p>
+    </div>
+    <script>
+        function fetchLatestRecord() {
+            fetch('/latest-record')
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        document.getElementById('record-data').textContent = JSON.stringify(data.all, null, 2);
+                        document.getElementById('created-at').textContent = `Created At: ${new Date(data.createdAt).toLocaleString()}`;
+                    } else {
+                        document.getElementById('record-data').textContent = 'No records found';
+                        document.getElementById('created-at').textContent = 'Created At: N/A';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching latest record:', error);
+                });
+        }
+
+        function updateCurrentTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = `Current Time: ${now.toLocaleString()}`;
+        }
+
+        // Fetch the latest record every second
+        setInterval(fetchLatestRecord, 1000);
+
+        // Update the current time every second
+        setInterval(updateCurrentTime, 1000);
+
+        // Fetch immediately on load
+        fetchLatestRecord();
+        updateCurrentTime();
+    </script>
+</body>
+</html>
