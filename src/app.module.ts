@@ -1,0 +1,26 @@
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { DatabaseModule } from './database/database.module';
+import { AuthController } from './auth/auth.controller';
+import { UserController } from './user/user.controller';
+import { VehicleModule } from './vehicle/vehicle.module';
+import { VehicleController } from './vehicle/vehicle.controller';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    AuthModule,
+    UserModule,
+    DatabaseModule,
+    VehicleModule
+  ],
+  controllers: [AppController, AuthController, UserController, VehicleController],
+  providers: [AppService],
+})
+export class AppModule {}
