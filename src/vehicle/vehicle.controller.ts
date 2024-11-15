@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from "@nestjs/common";
+import { Controller, Get, Post, Body, Put, Param } from "@nestjs/common";
 import { VehicleService } from "./vehicle.service";
 import { Prisma } from ".prisma/client";
 
@@ -59,5 +59,13 @@ export class VehicleController {
   @Get('obd-checks/latest')
   async getLatestObdCheck() {
     return this.vehicleService.getLatestObdCheck();
+  }
+
+  @Put('route/:vehicleId')
+  async updateCurrentROute(
+    @Body() data: Prisma.RoutesCreateInput,
+    @Param("vehicleId") vehicleId: string 
+  ) {
+    return this.vehicleService.createOrUpdateRoute(vehicleId, data)
   }
 }

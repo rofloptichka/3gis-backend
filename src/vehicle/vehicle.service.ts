@@ -29,20 +29,30 @@ export class VehicleService{
     }
 
     async getMetrics(){
-        return await this.db.obs.findMany()
+        return await this.db.obd.findMany()
     }
 
     async createGps(data: Prisma.GpsCreateInput){
-        return await this.db.gps.create({data})
+        const newGps = await this.db.gps.create({ data });
+        if (data.vehicleId) {
+            await this.db.vehicle.update({
+              where: { id: data.vehicleId },
+              data: {
+                locationId: newGps.id,
+                location_time: newGps.timestamp, 
+              },
+            });
+          }
+        return newGps;
     }
 
     async createObdFuel(data: Prisma.Obd_fuelCreateInput){
         return await this.db.obd_fuel.create({data})
     }
 
-    async createObdCheck(data: Prisma.Obd_checkCreateInput){
-        return await this.db.obd_check.create({all: data})
-    }
+    async createObdCheck(data: Prisma.Obd_checkCreateInput) {
+        return await this.db.obd_check.create({ data });
+    }    
 
     async getObdChecks(){
         return await this.db.obd_check.findMany()
@@ -54,5 +64,22 @@ export class VehicleService{
                 createdAt: 'desc',
             },
         });
+    }
+
+    async createOrUpdateRoute(vehicleId: string, routeData: Prisma.RoutesCreateInput) {
+        const existingRoute = await this.db.routes.findUnique({
+          where: { vehicleId },
+        });
+      
+        if (existingRoute) {
+          return await this.db.routes.update({
+            where: { id: existingRoute.id },
+            data: routeData,
+          });
+        } else {
+          return await this.db.routes.create({
+            data: { ...routeData, vehicleId },
+          });
+        }
     }
 }

@@ -46,15 +46,19 @@ model Vehicle {
   driverId       String?
   licensePlate   String?
   currentMission String?
-  location       String?
-  speed          Int?     @default(0)
-  maintenance    Json?
-  malfunctions   Json?
-  error_time     DateTime @default(now())
+  locationId     String?   @unique
+  location       Gps?      @relation(fields: [locationId], references: [id])
+  location_time  DateTime
+  maintenance    Json?     
+  malfunctions   Json?     
+  error_time     DateTime  @default(now())
   vehicleType    String?
+  obd            Json
   status         String?   @default("active")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  currentRoute   Routes?   
+  currentRouteId Int?      @unique
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model Driver {
@@ -91,7 +95,7 @@ model Obd {
   vehicleSpeed                 Float
   throttlePosition             Float
   fuelLevel                    Float
-  shortTrim1                   Float?   // Ensure this exists and matches exactly
+  shortTrim1                   Float?  
   longTrim1                    Float?
   shortTrim2                   Float?
   longTrim2                    Float?
@@ -118,7 +122,8 @@ model Obd {
 
 model Gps {
   id          String   @id @default(cuid())
-  vehicleId   String   
+  vehicleId   String?  @unique
+  vehicle     Vehicle? 
   latitude    Float
   longitude   Float
   altitude    Float?
@@ -129,16 +134,18 @@ model Gps {
 }
 
 
-model Routes{
-  id                           Int      @id @default(autoincrement())
-  vehicleId                    String
-  driver_id                    String
-  startingLocation             Json
-  endingLocation               Json
-  startingTime                 DateTime
-  endingTime                   DateTime
-  createdAt                    DateTime @default(now())
-  updatedAt                    DateTime @updatedAt
+
+model Routes {
+  id               Int      @id @default(autoincrement())
+  driver_id        String
+  startingLocation Json
+  endingLocation   Json
+  startingTime     DateTime
+  endingTime       DateTime
+  vehicleId        String   @unique 
+  vehicle          Vehicle  @relation(fields: [vehicleId], references: [id]) 
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now())
 }
 
 
