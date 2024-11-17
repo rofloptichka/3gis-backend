@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param } from "@nestjs/common";
+import { Controller, Get, Post, Body, Put, Param, HttpException, HttpStatus } from "@nestjs/common";
 import { VehicleService } from "./vehicle.service";
 import { Prisma } from ".prisma/client";
 
@@ -8,64 +8,147 @@ export class VehicleController {
 
   @Post()
   async createVehicle(@Body() data: Prisma.VehicleCreateInput) {
-    return this.vehicleService.createVehicle(data);
+    try {
+      return await this.vehicleService.createVehicle(data);
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   @Get()
   async getVehicles() {
-    return this.vehicleService.getVehicles();
+    try {
+      return await this.vehicleService.getVehicles();
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   @Post('request')
   async createRequest(@Body() data: Prisma.RequestCreateInput) {
-    return this.vehicleService.createRequest(data);
+    try {
+      return await this.vehicleService.createRequest(data);
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   @Get('requests')
   async getRequests() {
-    return this.vehicleService.getRequests();
+    try {
+      return await this.vehicleService.getRequests();
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   @Post('metric')
   async createMetric(@Body() data: Prisma.ObdCreateInput) {
-    return this.vehicleService.createMetric(data);
+    try {
+      return await this.vehicleService.createMetric(data);
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   @Get('metrics')
   async getMetrics() {
-    return this.vehicleService.getMetrics();
+    try {
+      return await this.vehicleService.getMetrics();
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   @Post('gps')
   async createGps(@Body() data: Prisma.GpsCreateInput) {
-    return this.vehicleService.createGps(data);
+    try {
+      return await this.vehicleService.createGps(data);
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   @Post('obd-fuel')
   async createObdFuel(@Body() data: Prisma.Obd_fuelCreateInput) {
-    return this.vehicleService.createObdFuel(data);
+    try {
+      return await this.vehicleService.createObdFuel(data);
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   @Post('obd-check')
   async createObdCheck(@Body() data: Prisma.Obd_checkCreateInput) {
-    return this.vehicleService.createObdCheck(data);
+    try {
+      return await this.vehicleService.createObdCheck(data);
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   @Get('obd-checks')
   async getObdChecks() {
-    return this.vehicleService.getObdChecks();
+    try {
+      return await this.vehicleService.getObdChecks();
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
   @Get('obd-checks/latest')
   async getLatestObdCheck() {
-    return this.vehicleService.getLatestObdCheck();
+    try {
+      return await this.vehicleService.getLatestObdCheck();
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 
-  @Put('route/:vehicleId')
-  async updateCurrentROute(
+  @Post('route/:vehicleId')
+  async updateCurrentRoute(
     @Body() data: Prisma.RoutesCreateInput,
     @Param("vehicleId") vehicleId: string 
   ) {
-    return this.vehicleService.createOrUpdateRoute(vehicleId, data)
+    try {
+      return await this.vehicleService.createRoute(vehicleId, data);
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  @Put('route/:vehicleId/:routeId')
+  async changeRoute(
+    @Param("vehicleId") vehicleId: string ,
+    @Param("routeId") routeId: number 
+  ){
+    try{
+      return await this.vehicleService.changeCurrentRoute(vehicleId, routeId)
+    }catch (err){
+      this.handleError(err)
+    }
+  }
+
+  @Get("violations/:vehicleId")
+  async getViolations(
+    @Param("vehicleId") vehicleId: string 
+  ){
+    try{
+      return await this.vehicleService.getViolation(vehicleId)
+    }catch (err){
+      this.handleError(err)
+    }
+  }
+
+
+  private handleError(error: any): void {
+    console.error('Error:', error.message); 
+    if (error instanceof HttpException) {
+      throw error; 
+    }
+    if (error.code === 'P2002') {
+      throw new HttpException('Duplicate entry', HttpStatus.CONFLICT);
+    }
+    throw new HttpException(error.message || 'Bad Request', HttpStatus.BAD_REQUEST);
   }
 }

@@ -29,7 +29,7 @@ model User {
 
 model Request {
   id          String   @id @default(cuid())
-  user        User?     @relation(fields: [userId], references: [id])
+  user        User?    @relation(fields: [userId], references: [id])
   userId      String
   title       String
   description String
@@ -42,98 +42,94 @@ model Request {
 }
 
 model Vehicle {
-  id             String   @id @default(cuid())
+  id             String      @id @default(cuid())
   driverId       String?
   licensePlate   String?
   currentMission String?
-  locationId     String?   @unique
-  location       Gps?      @relation(fields: [locationId], references: [id])
+  locationId     String?     @unique
+  location       Gps?        @relation(fields: [locationId], references: [id])
   location_time  DateTime
-  maintenance    Json?     
-  malfunctions   Json?     
-  error_time     DateTime  @default(now())
+  maintenance    Json?
+  malfunctions   Json?
+  error_time     DateTime    @default(now())
   vehicleType    String?
   obd            Json
-  status         String?   @default("active")
-  currentRoute   Routes?   
-  currentRouteId Int?      @unique
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  status         String?     @default("active")
+  currentRoute   Routes?     @relation(fields: [currentRouteId], references: [id])
+  currentRouteId Int?        @unique
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  Violation      Violation[]
 }
 
 model Driver {
-  id                           Int      @id @default(autoincrement())
-  name                         String
-  department                   String
-  experience                   String
-  DateoOfBirth                 DateTime @default(now())
-  phoneNumber                  String
+  id           Int      @id @default(autoincrement())
+  name         String
+  department   String
+  experience   String
+  DateoOfBirth DateTime @default(now())
+  phoneNumber  String
 }
 
 model Report {
-  id                           Int      @id @default(autoincrement())
-  vehicle_id                   Int
-  driver_id                    Int 
-  job_id                       Int
-  type                         String
-  time                         DateTime @default(now())
-  location                     String
-  media                        String
-  status                       String
+  id         Int      @id @default(autoincrement())
+  vehicle_id Int
+  driver_id  Int
+  job_id     Int
+  type       String
+  time       DateTime @default(now())
+  location   String
+  media      String
+  status     String
 }
 
 model Document {
-  id                           Int      @id @default(autoincrement())
-  name                         String
-  description                  String
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
 }
 
 model Obd {
-  id                           Int      @id @default(autoincrement())
-  vehicle_id                   String
-  engineRpm                    Float
-  vehicleSpeed                 Float
-  throttlePosition             Float
-  fuelLevel                    Float
-  shortTrim1                   Float?  
-  longTrim1                    Float?
-  shortTrim2                   Float?
-  longTrim2                    Float?
-  engineLoad                   Float
-  intakeAirTemperature         Float
-  massAirFlow                  Float
-  fuelPressure                 Float
-  fuelConsumptionRate          Float
-  engineCoolantTemperature     Float
-  oxygenSensorReading          Float
-  catalystTemperature          Float
-  evapEmissionControlPressure  Float
-  diagnosticTroubleCode        String
-  batteryVoltage               Float
-  oilTemperature               Float
-  distanceTraveled             Float
-  time                         DateTime? @default(now())
-  createdAt                    DateTime  @default(now())
-  updatedAt                    DateTime  @updatedAt
+  id                          Int       @id @default(autoincrement())
+  vehicle_id                  String
+  engineRpm                   Float
+  vehicleSpeed                Float
+  throttlePosition            Float
+  fuelLevel                   Float
+  shortTrim1                  Float?
+  longTrim1                   Float?
+  shortTrim2                  Float?
+  longTrim2                   Float?
+  engineLoad                  Float
+  intakeAirTemperature        Float
+  massAirFlow                 Float
+  fuelPressure                Float
+  fuelConsumptionRate         Float
+  engineCoolantTemperature    Float
+  oxygenSensorReading         Float
+  catalystTemperature         Float
+  evapEmissionControlPressure Float
+  diagnosticTroubleCode       String
+  batteryVoltage              Float
+  oilTemperature              Float
+  distanceTraveled            Float
+  time                        DateTime? @default(now())
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
 }
-
-
-
 
 model Gps {
-  id          String   @id @default(cuid())
-  vehicleId   String?  @unique
-  vehicle     Vehicle? 
-  latitude    Float
-  longitude   Float
-  altitude    Float?
-  speed       Float?
-  timestamp   DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  vehicleId String?
+  vehicle   Vehicle?
+  latitude  Float
+  longitude Float
+  altitude  Float?
+  speed     Float?
+  timestamp DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
-
-
 
 model Routes {
   id               Int      @id @default(autoincrement())
@@ -142,35 +138,43 @@ model Routes {
   endingLocation   Json
   startingTime     DateTime
   endingTime       DateTime
-  vehicleId        String   @unique 
-  vehicle          Vehicle  @relation(fields: [vehicleId], references: [id]) 
+  geojson          Json?
+  vehicleId        String?
+  vehicle          Vehicle?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @default(now())
 }
 
-
 model Obd_fuel {
-  id                           Int      @id @default(autoincrement())
-  vehicle_id                   String
-  engineRpm                    Int
-  fuelLevel                    Int
-  engineLoad                   Int
-  massAirFlow                  Float    // Changed to Float
-  fuelPressure                 Int
-  fuelConsumptionRate          Float    // Changed to Float
-  diagnosticTroubleCode        String
-  absStatus                    Boolean
-  tirePressure                 Int
-  distanceTraveled             Float    // Changed to Float
-  time                         DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                    Int      @id @default(autoincrement())
+  vehicle_id            String
+  engineRpm             Int
+  fuelLevel             Int
+  engineLoad            Int
+  massAirFlow           Float // Changed to Float
+  fuelPressure          Int
+  fuelConsumptionRate   Float // Changed to Float
+  diagnosticTroubleCode String
+  absStatus             Boolean
+  tirePressure          Int
+  distanceTraveled      Float // Changed to Float
+  time                  DateTime @default(now())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 }
 
-
-model Obd_check{
-  id                           Int   @id @default(autoincrement())
-  all                          Json
-  createdAt   DateTime @default(now())
+model Obd_check {
+  id        Int      @id @default(autoincrement())
+  all       Json
+  createdAt DateTime @default(now())
 }
 
+model Violation {
+  id          String   @id @default(cuid())
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  type        String
+  description String?
+  context     Json?
+  createdAt   DateTime @default(now())
+}
