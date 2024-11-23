@@ -156,6 +156,39 @@ export class VehicleController {
     }
   }
 
+  @Post("counter")
+  async createCounter(
+    @Body() data: Prisma.CounterCreateInput
+  ){
+    try{
+      return await this.vehicleService.createCounter(data)
+    }catch(err){
+      this.handleError(err)
+    }
+  }
+
+  @Get("counter/:vehicleId")
+  async getCounters(
+    @Param("vehicleId") vehicleId: string 
+  ){
+    try{
+      return await this.vehicleService.getCounters(vehicleId)
+    }catch(err){
+      this.handleError(err)
+    }
+  }
+
+  @Post("violation")
+  async createViolation(
+    @Body() data: Prisma.ViolationCreateInput
+  ){
+    try{
+      return await this.vehicleService.createViolation(data)
+    }catch(err){
+      this.handleError(err)
+    }
+  }
+
 
   private handleError(error: any): void {
     console.error('Error:', error.message); 
