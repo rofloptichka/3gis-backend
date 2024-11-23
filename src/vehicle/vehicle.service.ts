@@ -32,9 +32,32 @@ export class VehicleService{
         return await this.db.request.findMany()
     }
 
+    async createMetric(data: Prisma.ObdCreateInput) {
+      const counters = await this.getCounters(data.vehicle_id)
 
-    async createMetric(data: Prisma.ObdCreateInput){
-        return await this.db.obd.create({data})
+      for (let counter of counters){
+        if (counter.nextDistance > data.distanceTraveled){
+          await this.createViolation({
+            vehicle: {connect: {id: data.vehicle_id}},
+            type: `ThresholdExceeded`,
+            description: `Vehicle has exceeded the threshold for counter: ${counter.title}.`,
+            context: {
+              currentDistance: data.distanceTraveled,
+              threshold: counter.nextDistance,
+              counterTitle: counter.title,
+              counterDescription: counter.description,
+              counterId: counter.id
+            }, 
+          });
+          const updatedNextDistance = counter.nextDistance + counter.needDistance;
+          await this.db.counter.update({
+            where: { id: counter.id },
+            data: { nextDistance: updatedNextDistance },
+          });
+        }
+      }
+
+      return await this.db.obd.create({ data });
     }
 
     async getMetrics(){
@@ -229,6 +252,13 @@ export class VehicleService{
       return distance;
     }
     
+    async createCounter(data: Prisma.CounterCreateInput){
+      return await this.db.counter.create({data})
+    }
+
+    async getCounters(vehicleId: string){
+      return await this.db.counter.findMany({where: {vehicleId}})
+    }
 }
 
 interface Location {

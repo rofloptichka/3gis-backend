@@ -60,6 +60,7 @@ model Vehicle {
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   Violation      Violation[]
+  Counters        Counter[]
 }
 
 model Driver {
@@ -144,7 +145,7 @@ model Routes {
   geojson          Json?
   vehicleId        String?
   vehicle          Vehicle?
-  gps              Gps[]?
+  gps              Gps[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @default(now())
 }
@@ -181,4 +182,15 @@ model Violation {
   description String?
   context     Json?
   createdAt   DateTime @default(now())
+}
+
+
+model Counter {
+  id          String   @id @default(cuid())
+  vehicleId   String
+  vehicle     Vehicle @relation(fields: [vehicleId], references: [id])
+  title       String 
+  description String?
+  nextDistance    Int
+  needDistance Int 
 }
