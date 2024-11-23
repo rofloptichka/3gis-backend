@@ -9,6 +9,7 @@ import { AuthController } from './auth/auth.controller';
 import { UserController } from './user/user.controller';
 import { VehicleModule } from './vehicle/vehicle.module';
 import { VehicleController } from './vehicle/vehicle.controller';
+import { GpsModule } from './gps/gps.module';
 
 @Module({
   imports: [
@@ -18,7 +19,8 @@ import { VehicleController } from './vehicle/vehicle.controller';
     AuthModule,
     UserModule,
     DatabaseModule,
-    VehicleModule
+    VehicleModule,
+    GpsModule
   ],
   controllers: [AppController, AuthController, UserController, VehicleController],
   providers: [AppService],

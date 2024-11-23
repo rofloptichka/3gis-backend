@@ -60,10 +60,12 @@ export class VehicleController {
     }
   }
 
-  @Post('gps')
-  async createGps(@Body() data: Prisma.GpsCreateInput) {
+  @Post('gps/:routeId')
+  async createGps(@Body() data: Prisma.GpsCreateInput, @Param("routeId") routeId: string ) {
     try {
-      return await this.vehicleService.createGps(data);
+      const routeIdInt = parseInt(routeId)
+      console.log(routeIdInt)
+      return await this.vehicleService.createGps(data, routeIdInt);
     } catch (error) {
       this.handleError(error);
     }
@@ -120,14 +122,28 @@ export class VehicleController {
   @Put('route/:vehicleId/:routeId')
   async changeRoute(
     @Param("vehicleId") vehicleId: string ,
-    @Param("routeId") routeId: number 
+    @Param("routeId") routeId: string  
   ){
     try{
-      return await this.vehicleService.changeCurrentRoute(vehicleId, routeId)
+      const routeIdInt = parseInt(routeId)
+      return await this.vehicleService.changeCurrentRoute(vehicleId, routeIdInt)
     }catch (err){
       this.handleError(err)
     }
   }
+
+  @Get('route/:routeId')
+  async getRoute(
+    @Param("routeId") routeId: string 
+  ){
+    try{
+      const routeIdInt = parseInt(routeId)
+      return await this.vehicleService.processRoute(routeIdInt);
+    }catch(err){
+      this.handleError(err)
+    }
+  }
+
 
   @Get("violations/:vehicleId")
   async getViolations(
@@ -149,6 +165,7 @@ export class VehicleController {
     if (error.code === 'P2002') {
       throw new HttpException('Duplicate entry', HttpStatus.CONFLICT);
     }
+    console.error(error)
     throw new HttpException(error.message || 'Bad Request', HttpStatus.BAD_REQUEST);
   }
 }

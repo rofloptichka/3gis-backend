@@ -122,10 +122,13 @@ model Gps {
   id        String   @id @default(cuid())
   vehicleId String?
   vehicle   Vehicle?
+  routeId   Int? 
+  route     Routes?   @relation(fields: [routeId], references: [id])
   latitude  Float
   longitude Float
   altitude  Float?
   speed     Float?
+  isKey Boolean? @default(false)
   timestamp DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -133,14 +136,15 @@ model Gps {
 
 model Routes {
   id               Int      @id @default(autoincrement())
-  driver_id        String
+  driver_id        String @default("")
   startingLocation Json
   endingLocation   Json
-  startingTime     DateTime
-  endingTime       DateTime
+  startingTime     DateTime?
+  endingTime       DateTime?
   geojson          Json?
   vehicleId        String?
   vehicle          Vehicle?
+  gps              Gps[]?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @default(now())
 }
