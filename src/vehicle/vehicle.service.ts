@@ -116,7 +116,32 @@ export class VehicleService{
     }
 
     async createObdFuel(data: Prisma.Obd_fuelCreateInput){
-        return await this.db.obd_fuel.create({data})
+      const lastEntry = await this.db.obd_fuel.findFirst({
+        where: { vehicle_id: data.vehicle_id },
+        orderBy: { time: 'desc' },
+    });
+
+    if (lastEntry) {
+        const timeDifference = (new Date(data.time).getTime() - new Date(lastEntry.time).getTime()) / 3600000; 
+        const expectedDecrease = lastEntry.fuelConsumptionRate * timeDifference;
+
+        const actualDecrease = lastEntry.fuelLevel - data.fuelLevel;
+        if (actualDecrease > expectedDecrease * 1.2) { 
+            await this.createViolation({
+              vehicle: { connect: { id: data.vehicle_id } },
+              type: 'FUEL_THEFT',  
+              description: `Potential fuel theft detected for vehicle ${data.vehicle_id}. Fuel level drop exceeds expected consumption.`,
+              context: {
+                  fuelLevelDrop: actualDecrease,
+                  expectedDrop: expectedDecrease,
+                  fuelConsumptionRate: lastEntry.fuelConsumptionRate,
+                  timeDifference, 
+              },
+          });
+        }
+    }
+
+    return await this.db.obd_fuel.create({ data });
     }
 
     async createObdCheck(data: Prisma.Obd_checkCreateInput) {
