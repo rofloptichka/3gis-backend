@@ -14,6 +14,20 @@ enum Role {
   DRIVER
 }
 
+model VehicleFleet {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  image       String?
+  email       String
+  phoneNumber String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  vehicles Vehicle[]
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -42,25 +56,27 @@ model Request {
 }
 
 model Vehicle {
-  id             String      @id @default(cuid())
+  id             String        @id @default(cuid())
   driverId       String?
   licensePlate   String?
   currentMission String?
-  locationId     String?     @unique
-  location       Gps?        @relation(fields: [locationId], references: [id])
+  locationId     String?       @unique
+  location       Gps?          @relation(fields: [locationId], references: [id])
   location_time  DateTime
   maintenance    Json?
   malfunctions   Json?
-  error_time     DateTime    @default(now())
+  error_time     DateTime      @default(now())
   vehicleType    String?
   obd            Json
-  status         String?     @default("active")
-  currentRoute   Routes?     @relation(fields: [currentRouteId], references: [id])
-  currentRouteId Int?        @unique
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  status         String?       @default("active")
+  currentRoute   Routes?       @relation(fields: [currentRouteId], references: [id])
+  currentRouteId Int?          @unique
+  fleetId        String?
+  fleet          VehicleFleet? @relation(fields: [fleetId], references: [id])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   Violation      Violation[]
-  Counters        Counter[]
+  Counters       Counter[]
 }
 
 model Driver {
@@ -123,21 +139,21 @@ model Gps {
   id        String   @id @default(cuid())
   vehicleId String?
   vehicle   Vehicle?
-  routeId   Int? 
-  route     Routes?   @relation(fields: [routeId], references: [id])
+  routeId   Int?
+  route     Routes?  @relation(fields: [routeId], references: [id])
   latitude  Float
   longitude Float
   altitude  Float?
   speed     Float?
-  isKey Boolean? @default(false)
+  isKey     Boolean? @default(false)
   timestamp DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Routes {
-  id               Int      @id @default(autoincrement())
-  driver_id        String @default("")
+  id               Int       @id @default(autoincrement())
+  driver_id        String    @default("")
   startingLocation Json
   endingLocation   Json
   startingTime     DateTime?
@@ -146,8 +162,8 @@ model Routes {
   vehicleId        String?
   vehicle          Vehicle?
   gps              Gps[]
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @default(now())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now())
 }
 
 model Obd_fuel {
@@ -184,13 +200,12 @@ model Violation {
   createdAt   DateTime @default(now())
 }
 
-
 model Counter {
-  id          String   @id @default(cuid())
-  vehicleId   String
-  vehicle     Vehicle @relation(fields: [vehicleId], references: [id])
-  title       String 
-  description String?
-  nextDistance    Int
-  needDistance Int 
+  id           String  @id @default(cuid())
+  vehicleId    String
+  vehicle      Vehicle @relation(fields: [vehicleId], references: [id])
+  title        String
+  description  String?
+  nextDistance Int
+  needDistance Int
 }

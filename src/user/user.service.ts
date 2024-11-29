@@ -38,4 +38,12 @@ export class UserService {
     async deleteUser(id: string): Promise<User | null> {
       return this.databaseService.user.delete({ where: { id } });
     }
+
+    async createFleet(data: Prisma.VehicleFleetCreateInput){
+      return this.databaseService.vehicleFleet.create({data})
+    }
+
+    async getFleet(fleetId: string){
+      return this.databaseService.vehicleFleet.findFirst({where: {id: fleetId}})
+    }
   }

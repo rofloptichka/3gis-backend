@@ -31,5 +31,28 @@ export class UserController{
         }
     }
 
+    @Post("fleet")
+    async createFleet(
+        @Body() data: Prisma.VehicleFleetCreateInput
+    ){
+        try{
+            return await this.userService.createFleet(data)
+        }catch(err){
+            throw err 
+        }
+    }
+
+    @Get("fleet/:fleetId")
+    async getFleet(
+        @Param("fleetId") fleetId: string 
+    ){
+        try{
+            return await this.userService.getFleet(fleetId)
+        }catch(err){
+            throw err 
+
+        }
+    }
+
 
 }
