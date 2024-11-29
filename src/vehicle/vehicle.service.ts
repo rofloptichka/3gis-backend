@@ -130,7 +130,7 @@ export class VehicleService{
             await this.createViolation({
               vehicle: { connect: { id: data.vehicle_id } },
               type: 'FUEL_THEFT',  
-              description: `Potential fuel theft detected for vehicle ${data.vehicle_id}. Fuel level drop exceeds expected consumption.`,
+              description: `potential fuel theft detected for vehicle ${data.vehicle_id}. Fuel level drop exceeds expected consumption.`,
               context: {
                   fuelLevelDrop: actualDecrease,
                   expectedDrop: expectedDecrease,
