@@ -235,6 +235,39 @@ export class VehicleService{
       }
     }
 
+    async vehicleAnalytics(vehicleId: string){
+      const records = await this.db.obd_fuel.findMany({
+        where: { vehicle_id: vehicleId },
+        orderBy: { time: 'asc' },
+      });
+      if (records.length < 2) {
+        return {
+          message: `Not enough data to calculate analytics for vehicle ${vehicleId}.`,
+          totalDistance: 0,
+          totalFuelUsed: 0,
+        };
+      }
+      let totalDistance = 0;
+      let totalFuelUsed = 0;
+      for (let i = 1; i < records.length; i++) {
+        const previous = records[i - 1];
+        const current = records[i];
+    
+        if (current.distanceTraveled && previous.distanceTraveled) {
+          totalDistance += current.distanceTraveled - previous.distanceTraveled;
+        }
+    
+        if (current.fuelLevel && previous.fuelLevel) {
+          totalFuelUsed += previous.fuelLevel - current.fuelLevel;
+        }
+      }
+      return {
+        message: `Analytics for vehicle ${vehicleId}.`,
+        totalDistance: Math.round(totalDistance * 100) / 100,
+        totalFuelUsed: Math.round(totalFuelUsed * 100) / 100,
+      };
+    }
+
     async createObdCheck(data: Prisma.Obd_checkCreateInput) {
         return await this.db.obd_check.create({ data });
     }    

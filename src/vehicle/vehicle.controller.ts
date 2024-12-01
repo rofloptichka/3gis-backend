@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Put, Param, HttpException, HttpStatus, Query } from "@nestjs/common";
 import { VehicleService } from "./vehicle.service";
 import { Prisma } from ".prisma/client";
+import { get } from "http";
 
 @Controller('vehicles')
 export class VehicleController {
@@ -87,6 +88,17 @@ export class VehicleController {
   ){
     try{
       return await this.vehicleService.fleet_analitycs(fleetId)
+    }catch(err){
+      this.handleError(err)
+    }
+  }
+
+  @Get("vehicle/:vehicleId")
+  async getVehicleAnalytics(
+    @Param("vehicleId") vehicleId: string 
+  ){
+    try{
+      return await this.vehicleService.vehicleAnalytics(vehicleId)
     }catch(err){
       this.handleError(err)
     }
