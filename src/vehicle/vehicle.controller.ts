@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, HttpException, HttpStatus } from "@nestjs/common";
+import { Controller, Get, Post, Body, Put, Param, HttpException, HttpStatus, Query } from "@nestjs/common";
 import { VehicleService } from "./vehicle.service";
 import { Prisma } from ".prisma/client";
 
@@ -77,6 +77,19 @@ export class VehicleController {
       return await this.vehicleService.createObdFuel(data);
     } catch (error) {
       this.handleError(error);
+    }
+  }
+
+  @Get("obd-fuel/:vehicleId")
+  async getFuelAnalytics(
+    @Param("vehicleId") vehicleId: string,
+    @Query("time") time?: number
+  ){
+    try{
+      const timeInSeconds = time ? parseInt(time.toString(), 10) : 3600; 
+      return await this.vehicleService.fuel_analytics(vehicleId,timeInSeconds)
+    }catch(err){
+      this.handleError(err)
     }
   }
 

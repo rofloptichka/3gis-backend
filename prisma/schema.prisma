@@ -108,28 +108,28 @@ model Document {
 
 model Obd {
   id                          Int       @id @default(autoincrement())
-  vehicle_id                  String
-  engineRpm                   Float
-  vehicleSpeed                Float
-  throttlePosition            Float
-  fuelLevel                   Float
+  vehicle_id                  String?
+  engineRpm                   Float?
+  vehicleSpeed                Float?
+  throttlePosition            Float?
+  fuelLevel                   Float?
   shortTrim1                  Float?
   longTrim1                   Float?
   shortTrim2                  Float?
   longTrim2                   Float?
-  engineLoad                  Float
-  intakeAirTemperature        Float
-  massAirFlow                 Float
-  fuelPressure                Float
-  fuelConsumptionRate         Float
-  engineCoolantTemperature    Float
-  oxygenSensorReading         Float
-  catalystTemperature         Float
-  evapEmissionControlPressure Float
-  diagnosticTroubleCode       String
-  batteryVoltage              Float
-  oilTemperature              Float
-  distanceTraveled            Float
+  engineLoad                  Float?
+  intakeAirTemperature        Float?
+  massAirFlow                 Float?
+  fuelPressure                Float?
+  fuelConsumptionRate         Float?
+  engineCoolantTemperature    Float?
+  oxygenSensorReading         Float?
+  catalystTemperature         Float?
+  evapEmissionControlPressure Float?
+  diagnosticTroubleCode       String?
+  batteryVoltage              Float?
+  oilTemperature              Float?
+  distanceTraveled            Float?
   time                        DateTime? @default(now())
   createdAt                   DateTime  @default(now())
   updatedAt                   DateTime  @updatedAt
@@ -168,17 +168,17 @@ model Routes {
 
 model Obd_fuel {
   id                    Int      @id @default(autoincrement())
-  vehicle_id            String
-  engineRpm             Int
-  fuelLevel             Int
-  engineLoad            Int
-  massAirFlow           Float // Changed to Float
-  fuelPressure          Int
-  fuelConsumptionRate   Float // Changed to Float
-  diagnosticTroubleCode String
-  absStatus             Boolean
-  tirePressure          Int
-  distanceTraveled      Float // Changed to Float
+  vehicle_id            String?
+  engineRpm             Int?
+  fuelLevel             Int?
+  engineLoad            Int?
+  massAirFlow           Float? // Changed to Float
+  fuelPressure          Int?
+  fuelConsumptionRate   Float? // Changed to Float
+  diagnosticTroubleCode String?
+  absStatus             Boolean?
+  tirePressure          Int?
+  distanceTraveled      Float? // Changed to Float
   time                  DateTime @default(now())
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt

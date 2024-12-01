@@ -57,7 +57,26 @@ export class VehicleService{
         }
       }
 
-      return await this.db.obd.create({ data });
+      const obdRecord = await this.db.obd.create({ data });
+
+      const obdFuelData = {
+        vehicle_id: obdRecord.vehicle_id,
+        engineRpm: obdRecord.engineRpm ? Math.round(obdRecord.engineRpm) : null, 
+        fuelLevel: obdRecord.fuelLevel ? Math.round(obdRecord.fuelLevel) : null,
+        engineLoad: obdRecord.engineLoad ? Math.round(obdRecord.engineLoad) : null,
+        massAirFlow: obdRecord.massAirFlow, 
+        fuelPressure: obdRecord.fuelPressure ? Math.round(obdRecord.fuelPressure) : null,
+        fuelConsumptionRate: obdRecord.fuelConsumptionRate, 
+        diagnosticTroubleCode: obdRecord.diagnosticTroubleCode,
+        distanceTraveled: obdRecord.distanceTraveled, 
+        time: obdRecord.time,
+        absStatus: null, 
+        tirePressure: null, 
+      };
+
+      await this.createObdFuel(obdFuelData)
+
+      return obdRecord;
     }
 
     async getMetrics(){
@@ -119,30 +138,75 @@ export class VehicleService{
       const lastEntry = await this.db.obd_fuel.findFirst({
         where: { vehicle_id: data.vehicle_id },
         orderBy: { time: 'desc' },
-    });
+      });
 
-    if (lastEntry) {
-        const timeDifference = (new Date(data.time).getTime() - new Date(lastEntry.time).getTime()) / 3600000; 
-        const expectedDecrease = lastEntry.fuelConsumptionRate * timeDifference;
+      if (lastEntry) {
+          const timeDifference = (new Date(data.time).getTime() - new Date(lastEntry.time).getTime()) / 3600000; 
+          const expectedDecrease = lastEntry.fuelConsumptionRate * timeDifference;
 
-        const actualDecrease = lastEntry.fuelLevel - data.fuelLevel;
-        if (actualDecrease > expectedDecrease * 1.2) { 
-            await this.createViolation({
-              vehicle: { connect: { id: data.vehicle_id } },
-              type: 'FUEL_THEFT',  
-              description: `potential fuel theft detected for vehicle ${data.vehicle_id}. Fuel level drop exceeds expected consumption.`,
-              context: {
-                  fuelLevelDrop: actualDecrease,
-                  expectedDrop: expectedDecrease,
-                  fuelConsumptionRate: lastEntry.fuelConsumptionRate,
-                  timeDifference, 
-              },
-          });
+          const actualDecrease = lastEntry.fuelLevel - data.fuelLevel;
+          if (actualDecrease > expectedDecrease * 1.2) { 
+              await this.createViolation({
+                vehicle: { connect: { id: data.vehicle_id } },
+                type: 'FUEL_THEFT',  
+                description: `potential fuel theft detected for vehicle ${data.vehicle_id}. Fuel level drop exceeds expected consumption.`,
+                context: {
+                    fuelLevelDrop: actualDecrease,
+                    expectedDrop: expectedDecrease,
+                    fuelConsumptionRate: lastEntry.fuelConsumptionRate,
+                    timeDifference, 
+                },
+            });
+          }
+      }
+
+      return await this.db.obd_fuel.create({ data });
+    }
+
+    async fuel_analytics(vehicleId: string, timeInSeconds: number) {
+      const cutoffTime = new Date(Date.now() - timeInSeconds * 1000);
+    
+      const records = await this.db.obd_fuel.findMany({
+        where: {
+          vehicle_id: vehicleId,
+          time: {
+            gte: cutoffTime, 
+          },
+        },
+        orderBy: { time: 'asc' },
+      });
+    
+      if (records.length < 2) {
+        return {
+          message: `Not enough data to calculate fuel analytics for vehicle ${vehicleId} in the last ${timeInSeconds} seconds.`,
+          fuelFilled: 0,
+          fuelUsed: 0,
+        };
+      }
+    
+      let fuelFilled = 0; 
+      let fuelUsed = 0;   
+    
+      for (let i = 1; i < records.length; i++) {
+        const previous = records[i - 1];
+        const current = records[i];
+    
+        if (current.fuelLevel > previous.fuelLevel) {
+          fuelFilled += current.fuelLevel - previous.fuelLevel;
         }
+    
+        if (current.fuelLevel < previous.fuelLevel) {
+          const fuelDecrease = previous.fuelLevel - current.fuelLevel;
+          fuelUsed += fuelDecrease;
+        }
+      }
+    
+      return {
+        fuelFilled: Math.round(fuelFilled * 100) / 100, // 2 dec
+        fuelUsed: Math.round(fuelUsed * 100) / 100,     
+      };
     }
-
-    return await this.db.obd_fuel.create({ data });
-    }
+    
 
     async createObdCheck(data: Prisma.Obd_checkCreateInput) {
         return await this.db.obd_check.create({ data });
