@@ -80,6 +80,18 @@ export class VehicleController {
     }
   }
 
+  @Get("fleet/:fleetId")
+  async getFleetAnalytics(
+    @Param("fleetId") fleetId: string 
+
+  ){
+    try{
+      return await this.vehicleService.fleet_analitycs(fleetId)
+    }catch(err){
+      this.handleError(err)
+    }
+  }
+
   @Get("obd-fuel/:vehicleId")
   async getFuelAnalytics(
     @Param("vehicleId") vehicleId: string,

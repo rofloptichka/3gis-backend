@@ -207,6 +207,33 @@ export class VehicleService{
       };
     }
     
+    async fleet_analitycs(id: string){
+      const oneWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const vehicles = await this.db.vehicle.findMany({
+        where: { fleetId: id },
+        select: { id: true }, 
+      });
+      if (vehicles.length === 0) {
+        return {
+          totalDistance: 0,
+        };
+      }
+      const vehicleIds = vehicles.map((vehicle) => vehicle.id);
+      const totalDistance = await this.db.obd_fuel.aggregate({
+        _sum: {
+          distanceTraveled: true,
+        },
+        where: {
+          vehicle_id: { in: vehicleIds },
+          time: {
+            gte: oneWeek, 
+          },
+        },
+      });
+      return {
+        totalDistance: totalDistance._sum.distanceTraveled || 0
+      }
+    }
 
     async createObdCheck(data: Prisma.Obd_checkCreateInput) {
         return await this.db.obd_check.create({ data });
