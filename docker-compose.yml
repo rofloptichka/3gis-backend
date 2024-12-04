@@ -4,6 +4,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3333:3333"
     volumes:
       - .:/app
       - /app/node_modules
