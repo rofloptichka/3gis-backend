@@ -86,7 +86,7 @@ export class GpsService{
           where: { id: vehicleId },
           data: {
             locationId,
-            locationTime: timestamp,
+            location_time: timestamp,
           },
         });
     }
