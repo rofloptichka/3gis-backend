@@ -64,9 +64,8 @@ export class VehicleController {
   @Post('gps/:routeId')
   async createGps(@Body() data: Prisma.GpsCreateInput, @Param("routeId") routeId: string ) {
     try {
-      const routeIdInt = parseInt(routeId)
-      console.log(routeIdInt)
-      return await this.vehicleService.createGps(data, routeIdInt);
+      console.log(routeId)
+      return await this.vehicleService.createGps(data, routeId);
     } catch (error) {
       this.handleError(error);
     }
@@ -162,8 +161,7 @@ export class VehicleController {
     @Param("routeId") routeId: string  
   ){
     try{
-      const routeIdInt = parseInt(routeId)
-      return await this.vehicleService.changeCurrentRoute(vehicleId, routeIdInt)
+      return await this.vehicleService.changeCurrentRoute(vehicleId, routeId)
     }catch (err){
       this.handleError(err)
     }
@@ -174,8 +172,7 @@ export class VehicleController {
     @Param("routeId") routeId: string 
   ){
     try{
-      const routeIdInt = parseInt(routeId)
-      return await this.vehicleService.processRoute(routeIdInt);
+      return await this.vehicleService.processRoute(routeId);
     }catch(err){
       this.handleError(err)
     }
