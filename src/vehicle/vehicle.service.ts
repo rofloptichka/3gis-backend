@@ -83,7 +83,7 @@ export class VehicleService{
         return await this.db.obd.findMany()
     }
 
-    async createGps(data: Prisma.GpsCreateInput, routeId: number) {
+    async createGps(data: Prisma.GpsCreateInput, routeId: string) {
       const previousGps = await this.gps.getPreviousGps(data.vehicleId);
       const calculatedSpeed = this.gps.calculateSpeed(previousGps, data);
     
@@ -313,7 +313,7 @@ export class VehicleService{
       });
     }
 
-    async changeCurrentRoute(vehicleId: string, routeId: number) {
+    async changeCurrentRoute(vehicleId: string, routeId: string) {
         const updatedVehicle = await this.db.vehicle.update({
           where: { id: vehicleId },
           data: { currentRouteId: routeId },
@@ -333,7 +333,7 @@ export class VehicleService{
       });
     }
 
-    async processRoute(routeId: number) {
+    async processRoute(routeId: string) {
       const route = await this.getRoute(routeId);
   
       if (!route) {
@@ -366,7 +366,7 @@ export class VehicleService{
       };
     }
 
-    async getRoute(routeId: number){
+    async getRoute(routeId: string){
       return await this.db.routes.findFirst({
         where: {id: routeId},
         include: {
