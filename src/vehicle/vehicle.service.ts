@@ -23,6 +23,9 @@ export class VehicleService{
         return await this.db.vehicle.findMany()
     }
 
+    async getVehicleById(vehicleId: string): Promise<Vehicle | null> {
+      return await this.db.vehicle.findUnique({ where: { id: vehicleId } });
+    }
 
     async createRequest(data: Prisma.RequestCreateInput){
         return await this.db.request.create({data})
