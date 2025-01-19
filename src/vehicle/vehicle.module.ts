@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { VehicleService } from "./vehicle.service";
-import { GpsService } from "src/gps/gps.service";
-import { GpsModule } from "src/gps/gps.module";
+import { GpsService } from "../gps/gps.service";
+import { GpsModule } from "../gps/gps.module";
 
 
 

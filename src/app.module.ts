@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { DatabaseModule } from './database/database.module';
+import { DatabaseService } from './database/database.service';
 import { AuthController } from './auth/auth.controller';
 import { UserController } from './user/user.controller';
 import { VehicleModule } from './vehicle/vehicle.module';
@@ -23,6 +24,7 @@ import { GpsModule } from './gps/gps.module';
     GpsModule
   ],
   controllers: [AppController, AuthController, UserController, VehicleController],
-  providers: [AppService],
+  providers: [AppService, DatabaseService],
+  exports: [DatabaseService],
 })
 export class AppModule {}

@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { DatabaseService } from 'src/database/database.service';
+import { DatabaseService } from '../database/database.service';
 import { Prisma, Vehicle } from ".prisma/client";
 import axios from "axios";
 import * as turf from '@turf/turf';
 import { LineString } from "geojson";
-import { GpsService } from "src/gps/gps.service";
+import { GpsService } from "../gps/gps.service";
 import { connect } from "http2";
 
 
