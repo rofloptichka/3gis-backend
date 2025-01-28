@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { VehicleService } from '../src/vehicle/vehicle.service';
-import { GpsService } from '../src/gps/gps.service';
+import { VehicleService } from './vehicle/vehicle.service';
+import { GpsService } from './gps/gps.service';
 
 @Injectable()
 export class AppService {
