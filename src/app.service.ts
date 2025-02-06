@@ -21,7 +21,7 @@ export class AppService {
         licensePlate: data.licensePlate,
         vehicleType: data.vehicleType,
         location_time: data.location_time,
-        obd: data.obd,
+        obd: data.obd || {},
         currentMission: data.currentMission,
         //need to add other fields if JSON will have them
       });
@@ -37,7 +37,11 @@ export class AppService {
 
     // Obd create metric and fuel
     if (data.obd) {
-      await this.vehicleService.createMetric(data.obd);
+      const obdData = {
+        ...data.obd,
+        vehicleId: data.vehicleId,
+      };
+      await this.vehicleService.createMetric(obdData);
       await this.vehicleService.createObdFuel(data.obd);
     }
 
