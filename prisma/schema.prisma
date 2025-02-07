@@ -56,28 +56,31 @@ model Request {
 }
 
 model Vehicle {
-  id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  driverId       String?       @db.ObjectId
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  vin            String?
+  driverId       String?
+  driver         Driver?       @relation(fields: [driverId], references: [id])
   licensePlate   String?
   currentMission String?
-  locationId     String?       @unique @db.ObjectId
-  location       Gps?          @relation(fields: [locationId], references: [id])
+  locationId     String?  @unique @db.ObjectId
+  location       Gps?     @relation(fields: [locationId], references: [id], onDelete: NoAction, onUpdate: NoAction) // One side defines the relation
   location_time  DateTime
   maintenance    Json?
   malfunctions   Json?
-  error_time     DateTime      @default(now())
+  error_time     DateTime  @default(now())
   vehicleType    String?
   obd            Json
-  status         String?       @default("active")
-  currentRouteId String?       @unique @db.ObjectId
-  currentRoute   Routes?       @relation(fields: [currentRouteId], references: [id])
-  fleetId        String?       @db.ObjectId
+  status         String?   @default("active")
+  currentRouteId String?   @unique @db.ObjectId
+  currentRoute   Routes?   @relation(fields: [currentRouteId], references: [id])
+  fleetId        String?   @db.ObjectId
   fleet          VehicleFleet? @relation(fields: [fleetId], references: [id])
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
   Violation      Violation[]
   Counters       Counter[]
 }
+
 
 model Driver {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -86,6 +89,7 @@ model Driver {
   experience   String
   dateOfBirth  DateTime @default(now())
   phoneNumber  String
+  vehicles     Vehicle[]
 }
 
 model Report {
@@ -108,7 +112,7 @@ model Document {
 
 model Obd {
   id                          String   @id @default(auto()) @map("_id") @db.ObjectId
-  vehicle_id                  String?  @db.ObjectId
+  vehicleId                   String?  @db.ObjectId
   engineRpm                   Float?
   vehicleSpeed                Float?
   throttlePosition            Float?
@@ -137,8 +141,8 @@ model Obd {
 
 model Gps {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  vehicleId String?  @db.ObjectId
-  vehicle   Vehicle?
+  vehicleId String?  @unique @db.ObjectId // Ensure `@unique` for one-to-one relation
+  vehicle   Vehicle? @relation
   routeId   String?  @db.ObjectId
   route     Routes?  @relation(fields: [routeId], references: [id])
   latitude  Float
@@ -150,6 +154,8 @@ model Gps {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
 
 model Routes {
   id               String    @id @default(auto()) @map("_id") @db.ObjectId
@@ -182,7 +188,7 @@ model Counter {
   vehicle      Vehicle @relation(fields: [vehicleId], references: [id])
   title        String
   description  String?
-  nextDistance Int
+  currentDistance Int
   needDistance Int
 }
 
