@@ -11,7 +11,6 @@ import { UserController } from './user/user.controller';
 import { VehicleModule } from './vehicle/vehicle.module';
 import { VehicleController } from './vehicle/vehicle.controller';
 import { GpsModule } from './gps/gps.module';
-import { InputModule } from './input/input.module'
 import { FileModule } from './file/file.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -26,7 +25,6 @@ import { join } from 'path';
     DatabaseModule,
     VehicleModule,
     GpsModule,
-    InputModule,
     FileModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
