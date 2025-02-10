@@ -209,3 +209,10 @@ model Obd_fuel {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 }
+
+model File {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  filename  String
+  path      String  // Stores file path (e.g., "/uploads/file.pdf")
+  uploadedAt DateTime @default(now())
+}
