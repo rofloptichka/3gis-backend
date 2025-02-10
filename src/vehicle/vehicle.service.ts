@@ -36,26 +36,26 @@ export class VehicleService{
     }
 
     async createMetric(data: Prisma.ObdCreateInput) {
-      const counters = await this.getCounters(data.vehicle_id)
+      const counters = await this.getCounters(data.vehicleId);
 
-      for (let counter of counters){
-        if (counter.nextDistance > data.distanceTraveled){
+      for (let counter of counters) {
+        if (counter.currentDistance > data.distanceTraveled) {
           await this.createViolation({
-            vehicle: {connect: {id: data.vehicle_id}},
+            vehicle: {connect: {id: data.vehicleId}},
             type: `ThresholdExceeded`,
             description: `Vehicle has exceeded the threshold for counter: ${counter.title}.`,
             context: {
               currentDistance: data.distanceTraveled,
-              threshold: counter.nextDistance,
+              threshold: counter.currentDistance,
               counterTitle: counter.title,
               counterDescription: counter.description,
               counterId: counter.id
             }, 
           });
-          const updatedNextDistance = counter.nextDistance + counter.needDistance;
+          const updatedCurrentDistance = counter.currentDistance + counter.needDistance;
           await this.db.counter.update({
             where: { id: counter.id },
-            data: { nextDistance: updatedNextDistance },
+            data: { currentDistance: updatedCurrentDistance },
           });
         }
       }
@@ -63,22 +63,21 @@ export class VehicleService{
       const obdRecord = await this.db.obd.create({ data });
 
       const obdFuelData = {
-        vehicle_id: obdRecord.vehicle_id,
-        engineRpm: obdRecord.engineRpm ? Math.round(obdRecord.engineRpm) : null, 
+        vehicle_id: obdRecord.vehicleId,
+        engineRpm: obdRecord.engineRpm ? Math.round(obdRecord.engineRpm) : null,
         fuelLevel: obdRecord.fuelLevel ? Math.round(obdRecord.fuelLevel) : null,
         engineLoad: obdRecord.engineLoad ? Math.round(obdRecord.engineLoad) : null,
-        massAirFlow: obdRecord.massAirFlow, 
+        massAirFlow: obdRecord.massAirFlow,
         fuelPressure: obdRecord.fuelPressure ? Math.round(obdRecord.fuelPressure) : null,
-        fuelConsumptionRate: obdRecord.fuelConsumptionRate, 
+        fuelConsumptionRate: obdRecord.fuelConsumptionRate,
         diagnosticTroubleCode: obdRecord.diagnosticTroubleCode,
-        distanceTraveled: obdRecord.distanceTraveled, 
+        distanceTraveled: obdRecord.distanceTraveled,
         time: obdRecord.time,
-        absStatus: null, 
-        tirePressure: null, 
+        absStatus: null,
+        tirePressure: null,
       };
 
-      await this.createObdFuel(obdFuelData)
-
+      await this.createObdFuel(obdFuelData);
       return obdRecord;
     }
 
