@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, UseInterceptors, UploadedFile, StreamableFile, Res } from '@nestjs/common';
+import { Controller, Get, Post, Param, UseInterceptors, UploadedFile, StreamableFile, Res, Delete, Body } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
 import { diskStorage } from 'multer';
@@ -6,7 +6,7 @@ import { Response } from 'express';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 
-@Controller('files')
+@Controller('file')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
@@ -20,16 +20,29 @@ export class FileController {
       },
     }),
   }))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('driverId') driverId: string
+  ) {
     return await this.fileService.createFile({
       filename: file.filename,
       path: file.path,
+      contentType: file.mimetype,
+      driverId
     });
   }
 
-  @Get(':id')
-  async getFile(@Param('id') id: string, @Res({ passthrough: true }) res: Response) {
-    const file = await this.fileService.getFile(id);
+  @Get()
+  async getAllFiles(@Param('driverId') driverId: string) {
+    return await this.fileService.getAllFiles(driverId);
+  }
+
+  @Get('view/:filename')
+  async getFile(
+    @Param('filename') filename: string, 
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const file = await this.fileService.getFile(filename);
     if (!file) {
       throw new Error('File not found');
     }
@@ -42,4 +55,9 @@ export class FileController {
     
     return new StreamableFile(stream);
   }
-} 
+
+  @Delete(':filename')
+  async deleteFile(@Param('filename') filename: string) {
+    return await this.fileService.deleteFile(filename);
+  }
+}
