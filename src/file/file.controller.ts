@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, UseInterceptors, UploadedFile, StreamableFile, Res, Delete, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, UseInterceptors, UploadedFile, StreamableFile, Res, Delete, Body, Query } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
 import { diskStorage } from 'multer';
@@ -33,7 +33,10 @@ export class FileController {
   }
 
   @Get()
-  async getAllFiles(@Param('driverId') driverId: string) {
+  async getAllFiles(@Query('driverId') driverId?: string) {
+    if (!driverId) {
+      throw new Error('driverId is required');
+    }
     return await this.fileService.getAllFiles(driverId);
   }
 
