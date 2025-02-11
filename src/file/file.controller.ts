@@ -52,8 +52,8 @@ export class FileController {
 
     const stream = createReadStream(join(process.cwd(), file.path));
     res.set({
-      'Content-Type': 'application/octet-stream',
-      'Content-Disposition': `attachment; filename="${file.filename}"`,
+      'Content-Type': file.contentType,
+      'Content-Disposition': `inline; filename="${file.filename}"`,
     });
     
     return new StreamableFile(stream);
